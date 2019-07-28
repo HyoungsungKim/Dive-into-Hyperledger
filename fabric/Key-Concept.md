@@ -60,3 +60,27 @@ Hyperledger Fabric implements a modular architecture to provide functional choic
 
 ## Hyperledger Fabric Model
 
+### Assets
+
+***Assets can range from the tangible (real estate and hardware) to the intangible (contracts and intellectual property).*** Hyperledger Fabric provides the ability to modify assets using chaincode transactions.
+
+Assets are represented in Hyperledger Fabric as a collection of key-value pairs, with state changes recorded as transactions on a [Channel](https://hyperledger-fabric.readthedocs.io/en/release-1.4/glossary.html#channel) ledger.  Assets can be represented in binary and/or JSON form.
+
+You can easily define and use assets in your Hyperledger Fabric applications using the [Hyperledger Composer](https://github.com/hyperledger/composer) tool.
+
+### Chaincode
+
+***Chaincode is software defining an asset or assets, and the transaction instructions for modifying the asset(s).***
+
+- Chaincode enforces the rules for reading or altering key-value pairs or other state database information.
+- Chaincode functions execute against the ledger's current state database and are initiated through a transaction proposal.
+- Chaincode execution results in a set of key-value writes (write set) that can be submitted to the network and applied to the ledger on all peers.
+
+### Ledger Features
+
+The ledger is the sequenced, tamper-resistant record of all state transitions in the fabric. State transitions are a result of chaincode invocations (‘transactions’) submitted by participating parties. Each transaction results in a set of asset key-value pairs that are committed to the ledger as creates, updates, or deletes.
+
+***There is one ledger per channel.*** Each peer maintains a copy of the ledger for each channel of which they are a member.
+
+### Privacy
+
