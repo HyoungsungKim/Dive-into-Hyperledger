@@ -64,7 +64,7 @@ Hyperledger Fabric implements a modular architecture to provide functional choic
 
 ***Assets can range from the tangible (real estate and hardware) to the intangible (contracts and intellectual property).*** Hyperledger Fabric provides the ability to modify assets using chaincode transactions.
 
-Assets are represented in Hyperledger Fabric as a collection of key-value pairs, with state changes recorded as transactions on a [Channel](https://hyperledger-fabric.readthedocs.io/en/release-1.4/glossary.html#channel) ledger.  Assets can be represented in binary and/or JSON form.
+Assets are represented in Hyperledger Fabric as a collection of key-value pairs, with state changes recorded as transactions on a [Channel](https://hyperledger-fabric.readthedocs.io/en/release-1.4/glossary.html#channel) ledger. Assets can be represented in binary and/or JSON form.
 
 You can easily define and use assets in your Hyperledger Fabric applications using the [Hyperledger Composer](https://github.com/hyperledger/composer) tool.
 
@@ -84,3 +84,69 @@ The ledger is the sequenced, tamper-resistant record of all state transitions in
 
 ### Privacy
 
+***To further obfuscate the data, values within chaincode can be encrypted (in part or in total) using common cryptographic algorithms such as AES before sending transactions to the ordering service and appending blocks to the ledger.*** Once encrypted data has been written to the ledger, it can be decrypted only by a user in possession of the corresponding key that was used to generate the cipher text.
+
+### Consensus
+
+***Consensus is achieved ultimately when the order and results of a block’s transactions have met the explicit policy criteria checks.***
+
+- Prior to commitment, the peers will employ these system chaincodes to ***make sure that enough endorsements are present,*** and that they were derived from the appropriate entities.(잔액 확인)
+- Moreover, a ***versioning check*** will take place during which the current state of the ledger is agreed or consented upon, before any blocks containing transactions are appended to the ledger.
+  - ***This final check provides protection*** against double spend operations and other threats that might compromise data integrity, and allows for functions to be executed against non-static variables.
+
+Access control lists are implemented on hierarchical layers of the network (ordering service down to channels), and payloads are repeatedly signed, verified and authenticated as a transaction proposal passes through the different architectural components.
+
+To conclude, consensus is not merely limited to the agreed upon order of a batch of transactions; rather, it is an overarching(대단히 중요한) characterization that is achieved as a byproduct of the ongoing verifications that take place during a transaction’s journey from proposal to commitment.
+
+> Hyperledger에서는 endorsement가 coin 같은 개념으로 쓰이는듯?
+
+## Blockchain network
+
+### Creating the Network
+
+***The network is formed when an orderer is started.***
+
+In our example network, N,
+
+- the ordering service comprising a single node, O4, is configured according to a network configuration NC4, which gives administrative rights to organization R4.
+- At the network level, ***Certificate Authority CA4 is used to dispense(나누어 주다, 내놓다) identities to the administrators and network nodes of the R4 organization.***
+
+### Certificate Authorities
+
+You can also see a Certificate Authority, CA4, which is used to issue certificates to administrators and network nodes.
+
+- ***CA4 plays a key role in our network because it dispenses X.509(암호화 알고리즘) certificates that can be used to identify components as belonging to organization R4.***
+- Certificates issued by CAs can also be used to sign transactions to indicate that an organization endorses the transaction result – a precondition of it being accepted onto the ledger. Let’s examine these two aspects of a CA in a little more detail.
+
+Firstly, different components of the blockchain network use certificates to identify themselves to each other as being from a particular organization. That’s why there is usually more than one CA supporting a blockchain network – ***different organizations often use different CAs.*** 
+
+We’re going to use four CAs in our network; one of for each organization. Indeed, CAs are so important that Hyperledger Fabric provides you with a built-in one (called *Fabric-CA*) to help you get going, though in practice, organizations will choose to use their own CA.
+
+The mapping of certificates to member organizations is achieved by via a structure called a Membership Services Provider (MSP). Network configuration NC4 uses a named MSP to identify the properties of certificates dispensed by CA4 which associate certificate holders with organization R4.
+
+NC4 can then use this MSP name in policies to grant actors from R4 particular rights over network resources. An example of such a policy is to identify the administrators in R4 who can add new member organizations to the network.
+
+Secondly, we’ll see later how certificates issued by CAs are at the heart of the transaction generation and validation process. Specifically, X.509 certificates are used in client application transaction proposals and smart contract transaction responses to digitally sign transactions.
+
+Let’s recap the basic structure of our example blockchain network.
+There’s a resource, the network N, accessed by a set of users defined by a Certificate Authority CA4, who have a set of rights over the resources in the network N as described by policies contained inside a network configuration NC4. ***All of this is made real when we configure and start the ordering service node O4.***
+
+### Adding Network Administrators
+
+Organization R4 updates the network configuration to make organization R1 an administrator too. ***After this point R1 and R4 have equal rights over the network configuration.***
+
+We see the addition of a new organization R1 as an administrator – R1 and R4 now have equal rights over the network. We can also see that certificate authority CA1 has been added – it can be used to identify users from the R1 organization. ***After this point, users from both R1 and R4 can administer the network.***
+
+Although the orderer node, O4, is running on R4’s infrastructure, R1 has shared administrative rights over it, as long as it can gain network access. It means that R1 or R4 could update the network configuration NC4 to allow the R2 organization a subset of network operations. In this way, even though R4 is running the ordering service, and R1 has full administrative rights over it, ***R2 has limited rights to create new consortia.***
+
+#### Defining a Consortium
+
+Although the network can now be administered by R1 and R4, there is very little that can be done. ***The first thing we need to do is define a consortium.*** This word literally means “a group with a shared destiny”, so it’s an appropriate choice for a set of organizations in a blockchain network.
+
+***Why are consortia important?***
+
+- We can see that a consortium defines the set of organizations in the network who share a need to **transact** with one another – in this case R1 and R2. It really makes sense to group organizations together if they have a common goal, and that’s exactly what’s happening.
+
+We’re now going to use consortium X1 to create a really important part of a Hyperledger Fabric blockchain – **a channel**.
+
+### Creating a channel for a consortium
