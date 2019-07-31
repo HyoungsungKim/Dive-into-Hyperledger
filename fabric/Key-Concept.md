@@ -111,7 +111,7 @@ In our example network, N,
 - the ordering service comprising a single node, O4, is configured according to a network configuration NC4, which gives administrative rights to organization R4.
 - At the network level, ***Certificate Authority CA4 is used to dispense(나누어 주다, 내놓다) identities to the administrators and network nodes of the R4 organization.***
 
-### Certificate Authorities
+#### Certificate Authorities
 
 You can also see a Certificate Authority, CA4, which is used to issue certificates to administrators and network nodes.
 
@@ -139,7 +139,7 @@ We see the addition of a new organization R1 as an administrator – R1 and R4 n
 
 Although the orderer node, O4, is running on R4’s infrastructure, R1 has shared administrative rights over it, as long as it can gain network access. It means that R1 or R4 could update the network configuration NC4 to allow the R2 organization a subset of network operations. In this way, even though R4 is running the ordering service, and R1 has full administrative rights over it, ***R2 has limited rights to create new consortia.***
 
-#### Defining a Consortium
+### Defining a Consortium
 
 Although the network can now be administered by R1 and R4, there is very little that can be done. ***The first thing we need to do is define a consortium.*** This word literally means “a group with a shared destiny”, so it’s an appropriate choice for a set of organizations in a blockchain network.
 
@@ -150,3 +150,39 @@ Although the network can now be administered by R1 and R4, there is very little 
 We’re now going to use consortium X1 to create a really important part of a Hyperledger Fabric blockchain – **a channel**.
 
 ### Creating a channel for a consortium
+
+There can be multiple channels in a network, but for now, we’ll start with one.
+
+*A channel C1 has been created for R1 and R2 using the consortium definition X1. The channel is governed by a channel configuration CC1, completely separate to the network configuration. CC1 is managed by R1 and R2 who have equal rights over C1. R4 has no rights in CC1 whatsoever.*
+
+***The channel C1 provides a private communications mechanism for the consortium X1.*** We can see channel C1 has been connected to the ordering service O4 but that nothing else is attached to it.
+
+R3 and R4 can only interact with C1 if they are added by R1 or R2 to the appropriate policy in the ***channel configuration CC1.*** An example is defining who can add a new organization to the channel. Specifically, note that R4 cannot add itself to the channel C1 – it must, and can only, be authorized by R1 or R2.
+
+***Why are channels so important? Channels are useful because they provide a mechanism for private communications and private data between the members of a consortium.*** Channels provide privacy from other channels, and from the network. Channels provide an efficient sharing of infrastructure while maintaining data and communications privacy.
+
+We can also see that once a channel has been created, it is in a very real sense “free from the network”. It is only organizations that are explicitly specified in a channel configuration that have any control over it, from this time forward into the future. ***Likewise, any updates to network configuration NC4 from this time onwards will have no direct effect on channel configuration CC1;***
+
+- for example if consortia definition X1 is changed, it will not affect the members of channel C1. Channels are therefore useful because they allow private communications between the organizations constituting the channel.
+- Moreover, the data in a channel is completely isolated from the rest of the network, including other channels.
+
+As an aside, there is also a special **system channel** defined for use by the ordering service. It behaves in exactly the same way as a regular channel, which are sometimes called **application channels** for this reason. 
+
+### Applications and Smart Contract chaincode
+
+*A smart contract S5 has been installed onto P1. Client application A1 in organization R1 can use S5 to access the ledger via peer node P1. A1, P1 and O4 are all joined to channel C1, i.e. they can all make use of the communication facilities provided by that channel.*
+
+It might now appear that A1 can access the ledger L1 directly via P1, but in fact, ***all access is managed via a special program called a smart contract chaincode, S5.*** Think of S5 as defining all the common access patterns to the ledger;
+
+- S5 provides a well-defined set of ways by which the ledger L1 can be queried or updated.
+
+ In short, client application A1 has to go through smart contract S5 to get to ledger L1!
+
+### Installing a smart contract
+
+***After a smart contract S5 has been developed, an administrator in organization R1 must install it onto peer node P1.*** This is a straightforward operation; after it has occurred, P1 has full knowledge of S5. Specifically, P1 can see the **implementation** logic of S5 – the program code that it uses to access the ledger L1. We contrast this to the S5 **interface** which merely describes the inputs and outputs of S5, without regard to its implementation.
+
+### Endorsement policy
+
+***The most important piece of additional information supplied at instantiation is an endorsement policy.*** It describes which organizations must approve transactions before they will be accepted by other organizations onto their copy of the ledger. In our sample network, transactions can be only be accepted onto ledger L1 if R1 or R2 endorse them.
+
